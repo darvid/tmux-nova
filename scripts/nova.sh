@@ -2,8 +2,9 @@
 export LC_ALL=en_US.UTF-8
 
 current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-source $current_dir/utils.sh
+segments_dir="$(readlink -f "$current_dir/../segments")"
 
+source $current_dir/utils.sh
 
 #
 # dracula color palette
@@ -38,7 +39,13 @@ pane=$(get_option "@nova-pane" "#I#{?pane_in_mode, #{pane_mode},} #W #{?window_z
 #
 
 upsert_option "@nova-segment-mode" "#{?client_prefix,🦄,💊}"
-upsert_option "@nova-segment-whoami" "🧛 #[italics]#(whoami)@#h"
+upsert_option "@nova-segment-whoami" "#[italics]#(whoami)@#h"
+upsert_option "@nova-segment-whoami-prefix" "🧛"
+
+upsert_option "@nova-segment-spotify" "#($segments_dir/spotify.sh)"
+upsert_option "@nova-segment-spotify-roll" true
+upsert_option "@nova-segment-spotify-prefix" "🎧"
+upsert_option "@nova-segment-spotify-colors" "$light_purple $dark_gray"
 
 upsert_option "@nova-segment-mode-colors" "#{?client_prefix,$green,$dark_gray} #{?client_prefix,default,default}"
 
@@ -68,7 +75,7 @@ main() {
   #
   # interval
   #
-  interval=$(get_option "@nova-interval" 5)
+  interval=$(get_option "@nova-interval" 1)
   tmux set-option -g status-interval $interval
 
   #
