@@ -29,6 +29,9 @@ main() {
 	elif shell_is_osx; then
 		np="$(${current_dir}/../scripts/np_spotify_mac.script)"
 	fi
+  if [ -z "$np" ]; then
+    np="Not playing"
+  fi
 	echo "$(get_segment_content $SEGMENT_NAME "$np")"
 }
 
