@@ -1,14 +1,19 @@
 #!/bin/bash
 # https://github.com/joshmedeski/tmux-nerd-font-window-name
 
-NAME=$1
-SHOW_NAME="$(tmux show -gqv '@nova-pane-show-window-name')"
-DIVIDER="$(tmux show -gqv '@nova-pane-divider')"
+name=$1
+active=${2:false}
+show_name="$(tmux show -gqv '@nova-pane-show-window-name')"
+name_colors="$(tmux show -gqv '@nova-pane-name-colors')"
+icon_colors="$(tmux show -gqv '@nova-pane-icon-colors')"
+show_inactive_divider="$(tmux show -gqv '@nova-pane-show-inactive-divider')"
+divider="$(tmux show -gqv '@nova-pane-divider')"
+divider_colors="$(tmux show -gqv '@nova-pane-divider-colors')"
+divider_colors_active="$(tmux show -gqv '@nova-pane-divider-active-colors')"
 
 function get_shell_icon() {
 	local default_shell_icon=""
-	local shell_icon
-	shell_icon="$(tmux show -gqv '@nova-pane-window-name-shell-icon')"
+	local shell_icon="$(tmux show -gqv '@nova-pane-window-name-shell-icon')"
 	if [ -n "$shell_icon" ]; then
 		echo "$shell_icon"
 	else
@@ -16,10 +21,8 @@ function get_shell_icon() {
 	fi
 }
 
-SHELL_ICON=$(get_shell_icon)
-
 get_icon() {
-	case $NAME in
+	case $name in
 	tmux)
 		echo ""
 		;;
@@ -27,7 +30,7 @@ get_icon() {
 		echo ""
 		;;
 	fish | zsh | bash | tcsh)
-		echo "$SHELL_ICON"
+		echo "$(get_shell_icon)"
 		;;
 	vi | vim | nvim | lvim)
 		echo ""
@@ -57,19 +60,27 @@ get_icon() {
 		echo ""
 		;;
 	*)
-		if [ "$SHOW_NAME" = true ]; then
-			echo ""
-		else
-			echo "$NAME"
-		fi
+		echo ""
 		;;
 	esac
 }
 
-ICON=$(get_icon)
+main() {
+  local icon=$(get_icon)
+  local _divider
 
-if [ "${SHOW_NAME:-true}" = true ]; then
-	echo "$ICON" "$DIVIDER" "$NAME"
-else
-	echo "$ICON"
-fi
+  if [ "${show_name:-true}" = true ]; then
+    if [ "$active" = true ]; then
+      _divider="$divider"
+      local divider_colors="$divider_colors_active"
+    else
+      _divider=" "
+      local divider_colors="$divider_colors"
+    fi
+    echo "#[$icon_colors]$icon" "#[$divider_colors]$_divider" "#[$name_colors]$name"
+  else
+    echo "#[$icon_colors]$icon"
+  fi
+}
+
+main "$@"

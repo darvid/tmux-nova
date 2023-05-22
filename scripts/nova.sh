@@ -9,17 +9,19 @@ source $current_dir/utils.sh
 #
 # dracula color palette
 #
-white='#f8f8f2'
-gray='#44475a'
-dark_gray='#282a36'
-light_purple='#bd93f9'
-dark_purple='#6272a4'
-cyan='#8be9fd'
-green='#50fa7b'
-orange='#ffb86c'
-red='#ff5555'
-pink='#ff79c6'
-yellow='#f1fa8c'
+white="#f8f8f2"
+gray="#44475a"
+dark_gray="#282a36"
+light_purple="#bd93f9"
+dark_purple="#6272a4"
+cyan="#8be9fd"
+green="#50fa7b"
+orange="#ffb86c"
+red="#ff5555"
+pink="#ff79c6"
+dark_pink="##803b62"
+yellow="#f1fa8c"
+dark_yellow="##879306"
 
 #
 # global options
@@ -33,12 +35,23 @@ nerdfonts_right=$(get_option "@nova-nerdfonts-right" )
 nerdfonts_left=$(get_option "@nova-nerdfonts-left" )
 rows=$(get_option "@nova-rows" 1)
 
+set_option "@nova-pane-name-colors" "fg:$gray"
+set_option "@nova-pane-icon-colors" "fg:magenta"
+set_option "@nova-pane-divider-colors" "fg:$pink"
+set_option "@nova-pane-divider-active-colors" "fg:$pink"
+
 pane_copy_mode="#{?#{==:#{pane_mode},copy-mode},,}"
 pane_view_mode="#{?#{==:#{pane_mode},view-mode},,}"
-pane_window_name="#($segments_dir/window-name.sh #{pane_current_command})"
-pane_zoomed="#{?window_zoomed_flag, ,}"
-pane_mode="#{?pane_in_mode,$pane_copy_mode$pane_view_mode  ,}"
-pane=$(get_option "@nova-pane" "#[fg:$gray]#I $pane_mode$pane_window_name$pane_zoomed_flag")
+
+get_pane_fmt() {
+  local active=${1:-false}
+  local divider=$([ "$active" = true ] && echo "" || echo " ")
+  local pane_zoomed="#{?window_zoomed_flag,$divider ,}"
+  local pane_mode="#{?pane_in_mode,$pane_copy_mode$pane_view_mode $divider ,}"
+  local pane_window_name="#($segments_dir/window-name.sh #{pane_current_command} ${active})"
+  local pane=$(get_option "@nova-pane" "#I$divider $pane_mode$pane_window_name$pane_zoomed_flag")
+  echo "$pane"
+}
 
 #
 # default segments
@@ -47,12 +60,13 @@ pane=$(get_option "@nova-pane" "#[fg:$gray]#I $pane_mode$pane_window_name$pan
 upsert_option "@nova-segment-mode" "#{?client_prefix,🦄,💊}"
 upsert_option "@nova-segment-mode-colors" "#{?client_prefix,$green,$dark_gray} #{?client_prefix,default,default}"
 upsert_option "@nova-segment-whoami" "🧛 #[italics]#(whoami)@#h"
+upsert_option "@nova-segment-whoami-colors" "$pink $dark_pink"
 upsert_option "@nova-segment-mode-colors" "$pink $dark_gray"
 
 upsert_option "@nova-segment-spotify" "#($segments_dir/spotify.sh)"
 upsert_option "@nova-segment-spotify-roll" true
-upsert_option "@nova-segment-spotify-prefix" "🎧"
-upsert_option "@nova-segment-spotify-colors" "$light_purple $dark_gray"
+upsert_option "@nova-segment-spotify-prefix" " "
+upsert_option "@nova-segment-spotify-colors" "$dark_purple $light_purple"
 
 upsert_option "@nova-segment-mode-colors" "#{?client_prefix,$green,$dark_gray} #{?client_prefix,default,default}"
 
@@ -93,9 +107,9 @@ main() {
   else
     status_style_bg=$(get_option "@nova-status-style-bg" "$gray")
   fi
-  status_style_fg=$(get_option "@nova-status-style-fg" "$white")
+  status_style_fg=$(get_option "@nova-status-style-fg" "$gray")
   status_style_active_bg=$(get_option "@nova-status-style-active-bg" "$yellow")
-  status_style_active_fg=$(get_option "@nova-status-style-active-fg" "$dark_gray")
+  status_style_active_fg=$(get_option "@nova-status-style-active-fg" "$dark_yellow")
   tmux set-option -g status-style "bg=$status_style_bg,fg=$status_style_fg"
 
   #
@@ -172,7 +186,7 @@ main() {
 
   tmux set-window-option -g window-status-format "$(padding $margin)#[fg=$status_style_fg]#[bg=$status_style_bg]"
   tmux set-window-option -ga window-status-format "$(padding $padding)"
-  tmux set-window-option -ga window-status-format "$pane"
+  tmux set-window-option -ga window-status-format "$(get_pane_fmt)"
   tmux set-window-option -ga window-status-format "$(padding $padding)"
 
   if [ $nerdfonts = true ]; then
@@ -182,7 +196,7 @@ main() {
   fi
 
   tmux set-window-option -ga window-status-current-format "$(padding $padding)"
-  tmux set-window-option -ga window-status-current-format "$pane"
+  tmux set-window-option -ga window-status-current-format "$(get_pane_fmt true)"
   tmux set-window-option -ga window-status-current-format "$(padding $padding)"
 
   if [ $nerdfonts = true ]; then
