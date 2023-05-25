@@ -43,16 +43,6 @@ set_option "@nova-pane-divider-active-colors" "fg:$pink"
 pane_copy_mode="#{?#{==:#{pane_mode},copy-mode},,}"
 pane_view_mode="#{?#{==:#{pane_mode},view-mode},,}"
 
-get_pane_fmt() {
-  local active=${1:-false}
-  local divider=$([ "$active" = true ] && echo "" || echo " ")
-  local pane_zoomed="#{?window_zoomed_flag,$divider ,}"
-  local pane_mode="#{?pane_in_mode,$pane_copy_mode$pane_view_mode $divider ,}"
-  local pane_window_name="#($segments_dir/window-name.sh #{pane_current_command} ${active})"
-  local pane=$(get_option "@nova-pane" "#I$divider $pane_mode$pane_window_name$pane_zoomed_flag")
-  echo "$pane"
-}
-
 #
 # default segments
 #
@@ -83,6 +73,26 @@ add_margin() {
   fi
 }
 
+get_pane_fmt() {
+  local active=${1:-false}
+  local divider=$([ "$active" = true ] && echo "" || echo " ")
+  local pane_zoomed="#{?window_zoomed_flag,$divider ,}"
+  local pane_mode="#{?pane_in_mode,$pane_copy_mode$pane_view_mode $divider ,}"
+  local pane_window_name="#($segments_dir/window-name.sh #{pane_current_command} ${active})"
+  local pane=$(get_option "@nova-pane" "#I$divider $pane_mode$pane_window_name$pane_zoomed_flag")
+  echo "$pane"
+}
+
+get_status_style_fmt() {
+  local activity_color=$1
+  if [ -z "$activity_color" ]; then
+    activity_color=$(get_option "@nova-status-style-activity-bg" "$white")
+  fi
+  local normal_color=${2:-default}
+  local type=${3:-bg}
+  echo "#{?window_activity_flag,#[$type=$activity_color],#[$type=$normal_color]}"
+}
+
 main() {
   #
   # double
@@ -104,12 +114,17 @@ main() {
   #
   if [ $pills = true ]; then
     status_style_bg=$(get_option "@nova-status-style-bg" "default")
+    status_style_pill_bg=$(get_option "@nova-status-style-pill-bg" "$gray")
+    status_style_pill_fg=$(get_option "@nova-status-style-pill-fg" "$dark_gray")
   else
     status_style_bg=$(get_option "@nova-status-style-bg" "$gray")
   fi
   status_style_fg=$(get_option "@nova-status-style-fg" "$gray")
   status_style_active_bg=$(get_option "@nova-status-style-active-bg" "$yellow")
   status_style_active_fg=$(get_option "@nova-status-style-active-fg" "$dark_yellow")
+  status_style_activity_bg=$(get_option "@nova-status-style-activity-bg" "$red")
+  status_style_activity_fg=$(get_option "@nova-status-style-activity-fg" "$gray")
+
   tmux set-option -g status-style "bg=$status_style_bg,fg=$status_style_fg"
 
   #
@@ -174,17 +189,21 @@ main() {
   #
   pane_justify=$(get_option "@nova-pane-justify" "left")
   tmux set-option -g status-justify ${pane_justify}
+  tmux set-window-option -g window-status-format "$(padding $margin)"
 
   if [ $nerdfonts = true ]; then
     if [ $pills = true ]; then
-      tmux set-window-option -g window-status-current-format "$(padding $margin)#[fg=${status_style_active_bg}]#[bg=default]"
+      tmux set-window-option -ga window-status-format "$(get_status_style_fmt $status_style_activity_bg $status_style_bg fg)#[bg=default]"
+      tmux set-window-option -g window-status-current-format "$(padding $margin)$(get_status_style_fmt $status_style_activity_bg $status_style_active_bg fg)#[bg=default]"
     else
-      tmux set-window-option -g window-status-current-format "$(padding $margin)#[fg=${status_style_bg}]#[bg=${status_style_active_bg}]"
+      tmux set-window-option -g window-status-current-format "$(padding $margin)#[fg=${status_style_bg}]$(get_status_style_fmt $status_style_activity_bg $status_style_active_bg bg)"
     fi
+    tmux set-window-option -ga window-status-format "$(get_ple_end right)"
     tmux set-window-option -ga window-status-current-format "$(get_ple_end right)"
   fi
 
-  tmux set-window-option -g window-status-format "$(padding $margin)#[fg=$status_style_fg]#[bg=$status_style_bg]"
+  tmux set-window-option -ga window-status-format "$(get_status_style_fmt $status_style_activity_fg $status_style_pill_fg fg)"
+  tmux set-window-option -ga window-status-format "$(get_status_style_fmt $status_style_activity_bg $status_style_pill_bg bg)"
   tmux set-window-option -ga window-status-format "$(padding $padding)"
   tmux set-window-option -ga window-status-format "$(get_pane_fmt)"
   tmux set-window-option -ga window-status-format "$(padding $padding)"
@@ -201,7 +220,9 @@ main() {
 
   if [ $nerdfonts = true ]; then
     tmux set-window-option -ga window-status-current-format "#[fg=${status_style_active_bg},bg=${status_style_bg}]"
-    tmux set-window-option -ga window-status-current-format "$nerdfonts_left"
+    tmux set-window-option -ga window-status-current-format "$(get_ple_end left)"
+    tmux set-window-option -ga window-status-format "$(get_status_style_fmt $status_style_activity_bg $status_style_bg fg)#[bg=default]"
+    tmux set-window-option -ga window-status-format "$(get_ple_end left)"
   fi
 
   add_margin window-status-current-format
