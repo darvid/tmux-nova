@@ -75,7 +75,7 @@ add_margin() {
 
 get_pane_fmt() {
   local active=${1:-false}
-  local divider=$([ "$active" = true ] && echo "" || echo " ")
+  local divider=${2:-}
   local pane_zoomed="#{?window_zoomed_flag,$divider ,}"
   local pane_mode="#{?pane_in_mode,$pane_copy_mode$pane_view_mode $divider ,}"
   local pane_window_name="#($segments_dir/window-name.sh #{pane_current_command} ${active})"

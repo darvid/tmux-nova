@@ -70,7 +70,7 @@ main() {
   local _divider
 
   if [ "${show_name:-true}" = true ]; then
-    if [ "$active" = true ]; then
+    if [ "$active" = true ] || [ "${show_inactive_divider:-true}" = true ]; then
       _divider="$divider"
       local divider_colors="$divider_colors_active"
     else
