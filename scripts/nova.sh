@@ -190,10 +190,11 @@ main() {
   pane_justify=$(get_option "@nova-pane-justify" "left")
   tmux set-option -g status-justify ${pane_justify}
   tmux set-window-option -g window-status-format "$(padding $margin)"
+  tmux set-option -g window-status-activity-style bg=default,fg=default
 
   if [ $nerdfonts = true ]; then
     if [ $pills = true ]; then
-      tmux set-window-option -ga window-status-format "$(get_status_style_fmt $status_style_activity_bg $status_style_bg fg)#[bg=default]"
+      tmux set-window-option -g window-status-format "$(get_status_style_fmt $status_style_activity_bg $status_style_bg fg)"
       tmux set-window-option -g window-status-current-format "$(padding $margin)$(get_status_style_fmt $status_style_activity_bg $status_style_active_bg fg)#[bg=default]"
     else
       tmux set-window-option -g window-status-current-format "$(padding $margin)#[fg=${status_style_bg}]$(get_status_style_fmt $status_style_activity_bg $status_style_active_bg bg)"
