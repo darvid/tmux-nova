@@ -60,7 +60,7 @@ get_icon() {
 		echo ""
 		;;
 	*)
-		echo ""
+		echo "󰊠"
 		;;
 	esac
 }
