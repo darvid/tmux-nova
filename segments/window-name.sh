@@ -69,7 +69,7 @@ get_icon() {
 }
 
 main() {
-  local icon=$(get_icon)
+  local icon="#{?window_activity_flag,,$(get_icon)}"
   local _divider
 
   if [ "${show_name:-true}" = true ]; then

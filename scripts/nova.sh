@@ -2,7 +2,7 @@
 export LC_ALL=en_US.UTF-8
 
 current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-segments_dir="$(readlink -f "$current_dir/../segments")"
+segments_dir="$(readlink -f "${current_dir}/../segments")"
 
 source $current_dir/utils.sh
 
@@ -27,6 +27,7 @@ dark_yellow="##879306"
 # global options
 #
 
+divider=$(get_option "@nova-pane-divider" "")
 padding=$(get_option "@nova-padding" 0)
 margin=$(get_option "@nova-margin" 1)
 nerdfonts=$(get_option "@nova-nerdfonts" true)
@@ -35,11 +36,6 @@ nerdfonts_right=$(get_option "@nova-nerdfonts-right" )
 nerdfonts_left=$(get_option "@nova-nerdfonts-left" )
 rows=$(get_option "@nova-rows" 1)
 
-set_option "@nova-pane-name-colors" "fg:$gray"
-set_option "@nova-pane-icon-colors" "fg:magenta"
-set_option "@nova-pane-divider-colors" "fg:$pink"
-set_option "@nova-pane-divider-active-colors" "fg:$pink"
-
 pane_copy_mode="#{?#{==:#{pane_mode},copy-mode},,}"
 pane_view_mode="#{?#{==:#{pane_mode},view-mode},,}"
 
@@ -47,18 +43,24 @@ pane_view_mode="#{?#{==:#{pane_mode},view-mode},,}"
 # default segments
 #
 
+upsert_option "@nova-pane-name-colors" "fg:${gray}"
+upsert_option "@nova-pane-icon-colors" "fg:magenta"
+upsert_option "@nova-pane-divider" ""
+upsert_option "@nova-pane-divider-colors" "fg:${pink}"
+upsert_option "@nova-pane-divider-active-colors" "fg:${pink}"
+
 upsert_option "@nova-segment-mode" "#{?client_prefix,󰐂,󱩜}"
-upsert_option "@nova-segment-mode-colors" "#{?client_prefix,$green,$dark_gray} #{?client_prefix,default,default}"
-upsert_option "@nova-segment-whoami" " #[italics]#(whoami)@#h"
-upsert_option "@nova-segment-whoami-colors" "$pink $dark_pink"
-upsert_option "@nova-segment-mode-colors" "$pink $dark_gray"
+upsert_option "@nova-segment-mode-colors" "#{?client_prefix,${pink},${dark_pink}} #{?client_prefix,default,default}"
+upsert_option "@nova-segment-whoami" "#(printf ' ')${divider} #[italics]#(whoami)@#h"
+upsert_option "@nova-segment-whoami-colors" "${pink} ${dark_pink}"
+upsert_option "@nova-segment-mode-colors" "${pink} ${dark_gray}"
 
-upsert_option "@nova-segment-spotify" "#($segments_dir/spotify.sh)"
+upsert_option "@nova-segment-spotify" "#(${segments_dir}/spotify.sh)"
 upsert_option "@nova-segment-spotify-roll" true
-upsert_option "@nova-segment-spotify-prefix" " "
-upsert_option "@nova-segment-spotify-colors" "$dark_purple $light_purple"
+upsert_option "@nova-segment-spotify-prefix" " ${divider}"
+upsert_option "@nova-segment-spotify-colors" "${dark_purple} ${light_purple}"
 
-upsert_option "@nova-segment-mode-colors" "#{?client_prefix,$green,$dark_gray} #{?client_prefix,default,default}"
+upsert_option "@nova-segment-mode-colors" "#{?client_prefix,${green},${dark_gray}} #{?client_prefix,default,default}"
 
 add_margin() {
   local option=${1:-status-left}
@@ -75,11 +77,10 @@ add_margin() {
 
 get_pane_fmt() {
   local active=${1:-false}
-  local divider=${2:-}
-  local pane_zoomed="#{?window_zoomed_flag,$divider ,}"
-  local pane_mode="#{?pane_in_mode,$pane_copy_mode$pane_view_mode $divider ,}"
-  local pane_window_name="#($segments_dir/window-name.sh #{pane_current_command} ${active})"
-  local pane=$(get_option "@nova-pane" "#I$divider $pane_mode$pane_window_name$pane_zoomed_flag")
+  local pane_zoomed="#{?window_zoomed_flag,${divider} ,}"
+  local pane_mode="#{?pane_in_mode,${pane_copy_mode}${pane_view_mode} $divider ,}"
+  local pane_window_name="#(${segments_dir}/window-name.sh #{pane_current_command} ${active})"
+  local pane=$(get_option "@nova-pane" "#I${divider} ${pane_mode}${pane_window_name}${pane_zoomed_flag}")
   echo "$pane"
 }
 
@@ -90,7 +91,7 @@ get_status_style_fmt() {
   fi
   local normal_color=${2:-default}
   local type=${3:-bg}
-  echo "#{?window_activity_flag,#[$type=$activity_color],#[$type=$normal_color]}"
+  echo "#{?window_activity_flag,#[${type}=${activity_color}],#[${type}=${normal_color}]}"
 }
 
 main() {
@@ -114,24 +115,24 @@ main() {
   #
   if [ $pills = true ]; then
     status_style_bg=$(get_option "@nova-status-style-bg" "default")
-    status_style_pill_bg=$(get_option "@nova-status-style-pill-bg" "$gray")
-    status_style_pill_fg=$(get_option "@nova-status-style-pill-fg" "$dark_gray")
+    status_style_pill_bg=$(get_option "@nova-status-style-pill-bg" "${gray}")
+    status_style_pill_fg=$(get_option "@nova-status-style-pill-fg" "${dark_gray}")
   else
-    status_style_bg=$(get_option "@nova-status-style-bg" "$gray")
+    status_style_bg=$(get_option "@nova-status-style-bg" "${gray}")
   fi
-  status_style_fg=$(get_option "@nova-status-style-fg" "$gray")
-  status_style_active_bg=$(get_option "@nova-status-style-active-bg" "$yellow")
-  status_style_active_fg=$(get_option "@nova-status-style-active-fg" "$dark_yellow")
-  status_style_activity_bg=$(get_option "@nova-status-style-activity-bg" "$red")
-  status_style_activity_fg=$(get_option "@nova-status-style-activity-fg" "$gray")
+  status_style_fg=$(get_option "@nova-status-style-fg" "${gray}")
+  status_style_active_bg=$(get_option "@nova-status-style-active-bg" "${yellow}")
+  status_style_active_fg=$(get_option "@nova-status-style-active-fg" "${dark_yellow}")
+  status_style_activity_bg=$(get_option "@nova-status-style-activity-bg" "${red}")
+  status_style_activity_fg=$(get_option "@nova-status-style-activity-fg" "${gray}")
 
   tmux set-option -g status-style "bg=$status_style_bg,fg=$status_style_fg"
 
   #
   # pane
   #
-  pane_border_style=$(get_option "@nova-pane-border-style" "$dark_gray")
-  pane_active_border_style=$(get_option "@nova-pane-active-border-style" "$gray")
+  pane_border_style=$(get_option "@nova-pane-border-style" "${dark_gray}")
+  pane_active_border_style=$(get_option "@nova-pane-active-border-style" "${gray}")
   tmux set-option -g pane-border-style "fg=${pane_border_style}"
   tmux set-option -g pane-active-border-style "fg=${pane_active_border_style}"
 
@@ -145,12 +146,12 @@ main() {
 
   first_left_segment=true
   for segment in "${segments_left[@]}"; do
-    segment_content=$(get_option "@nova-segment-$segment" "mode")
-    segment_colors=$(get_option "@nova-segment-$segment-colors" "$dark_gray $gray")
-    IFS=' ' read -r -a segment_colors <<< $segment_colors
+    segment_content=$(get_option "@nova-segment-${segment}" "mode")
+    segment_colors=$(get_option "@nova-segment-${segment}-colors" "${dark_gray} ${gray}")
+    IFS=' ' read -r -a segment_colors <<< ${segment_colors}
     if [ "$segment_content" != "" ]; then
       # condition everything on the non emptiness of the evaluated segment
-      tmux set-option -ga status-left "#{?#{w:#{E:@nova-segment-$segment}},"
+      tmux set-option -ga status-left "#{?#{w:#{E:@nova-segment-${segment}}},"
 
       if [ $nerdfonts = true ]; then
         if [ $first_left_segment != true ] || [ $first_left_segment = true ] && [ $pills = true ]; then
@@ -165,9 +166,9 @@ main() {
       fi
 
       tmux set-option -ga status-left "#[fg=${segment_colors[1]}#,bg=${segment_colors[0]}]"
-      tmux set-option -ga status-left "$(padding $padding)"
+      tmux set-option -ga status-left "$(padding ${padding})"
       tmux set-option -ga status-left "$segment_content"
-      tmux set-option -ga status-left "$(padding $padding)"
+      tmux set-option -ga status-left "$(padding ${padding})"
 
       # set the fg color for the next nerdfonts seperator
       tmux set-option -ga status-left "#[fg=${segment_colors[0]}]"
@@ -192,7 +193,7 @@ main() {
   #
   pane_justify=$(get_option "@nova-pane-justify" "left")
   tmux set-option -g status-justify ${pane_justify}
-  tmux set-window-option -g window-status-format "$(padding $margin)"
+  tmux set-window-option -g window-status-format "$(padding ${margin})"
   tmux set-option -g window-status-activity-style bg=default,fg=default
 
   if [ $nerdfonts = true ]; then
@@ -240,8 +241,8 @@ main() {
   tmux set-option -g status-right ""
 
   for segment in "${segments_right[@]}"; do
-    segment_content=$(get_option "@nova-segment-$segment" "")
-    segment_colors=$(get_option "@nova-segment-$segment-colors" "$dark_gray $gray")
+    segment_content=$(get_option "@nova-segment-${segment}" "")
+    segment_colors=$(get_option "@nova-segment-${segment}-colors" "${dark_gray} ${gray}")
     IFS=' ' read -r -a segment_colors <<< $segment_colors
     if [ "$segment_content" != "" ] && [ "$segment_colors" != "" ]; then
       if [ $nerdfonts = true ] && [ ! -n "$(tmux show-option -gqv status-right)" ]; then
@@ -285,12 +286,12 @@ main() {
     segments_bottom_left=$(get_option "@nova-segments-$row-left" "")
     IFS=' ' read -r -a segments_bottom_left <<< $segments_bottom_left
 
-    tmux set-option -g status-format[$row] "#[fill=$status_style_double_bg]#[align=left]"
+    tmux set-option -g status-format[$row] "#[fill=${status_style_double_bg}]#[align=left]"
     nerdfonts_color="$status_style_double_bg"
 
     for segment in "${segments_bottom_left[@]}"; do
-      segment_content=$(get_option "@nova-segment-$segment" "")
-      segment_colors=$(get_option "@nova-segment-$segment-colors" "$dark_gray $gray")
+      segment_content=$(get_option "@nova-segment-${segment}" "")
+      segment_colors=$(get_option "@nova-segment-${segment}-colors" "$dark_gray $gray")
       IFS=' ' read -r -a segment_colors <<< $segment_colors
       if [ "$segment_content" != "" ]; then
         if [ $pills = true ]; then
@@ -326,8 +327,8 @@ main() {
     tmux set-option -ga status-format[$row] "#[align=centre]"
 
     for segment in "${segments_bottom_center[@]}"; do
-      segment_content=$(get_option "@nova-segment-$segment")
-      segment_colors=$(get_option "@nova-segment-$segment-colors" "$dark_gray $gray")
+      segment_content=$(get_option "@nova-segment-${segment}")
+      segment_colors=$(get_option "@nova-segment-${segment}-colors" "$dark_gray $gray")
       IFS=' ' read -r -a segment_colors <<< $segment_colors
 
       if [ "$segment_content" != "" ]; then
@@ -359,13 +360,13 @@ main() {
     tmux set-option -ga status-format[$row] "#[align=right]"
 
     for segment in "${segments_bottom_right[@]}"; do
-      segment_content=$(get_option "@nova-segment-$segment")
-      segment_colors=$(get_option "@nova-segment-$segment-colors" "$dark_gray $gray")
+      segment_content=$(get_option "@nova-segment-${segment}")
+      segment_colors=$(get_option "@nova-segment-${segment}-colors" "$dark_gray $gray")
       IFS=' ' read -r -a segment_colors <<< $segment_colors
 
       if [ "$segment_content" != "" ]; then
         # condition everything on the non emptiness of the evaluated segment
-        tmux set-option -ga status-right "#{?#{w:#{E:@nova-segment-$segment}},"
+        tmux set-option -ga status-right "#{?#{w:#{E:@nova-segment-${segment}}},"
 
         if [ $nerdfonts = true ]; then
           tmux set-option -ga status-format[$row] "#[fg=${segment_colors[0]}]#[bg=#${nerdfonts_color}]"
