@@ -47,9 +47,9 @@ pane_view_mode="#{?#{==:#{pane_mode},view-mode},,}"
 # default segments
 #
 
-upsert_option "@nova-segment-mode" "#{?client_prefix,🦄,💊}"
+upsert_option "@nova-segment-mode" "#{?client_prefix,󰐂,󱩜}"
 upsert_option "@nova-segment-mode-colors" "#{?client_prefix,$green,$dark_gray} #{?client_prefix,default,default}"
-upsert_option "@nova-segment-whoami" "🧛 #[italics]#(whoami)@#h"
+upsert_option "@nova-segment-whoami" " #[italics]#(whoami)@#h"
 upsert_option "@nova-segment-whoami-colors" "$pink $dark_pink"
 upsert_option "@nova-segment-mode-colors" "$pink $dark_gray"
 
@@ -172,6 +172,9 @@ main() {
       # set the fg color for the next nerdfonts seperator
       tmux set-option -ga status-left "#[fg=${segment_colors[0]}]"
 
+      # XXX: If mode is a single-character nerdfont, this fixes its size 🤫
+      tmux set-option -ga status-left "$(padding 1)"
+
       # condition end
       tmux set-option -ga status-left ',}'
 
@@ -194,10 +197,10 @@ main() {
 
   if [ $nerdfonts = true ]; then
     if [ $pills = true ]; then
-      tmux set-window-option -g window-status-format "$(get_status_style_fmt $status_style_activity_bg $status_style_bg fg)"
+      tmux set-window-option -g window-status-format "$(padding $margin)$(get_status_style_fmt $status_style_activity_bg $status_style_bg fg)"
       tmux set-window-option -g window-status-current-format "$(padding $margin)$(get_status_style_fmt $status_style_activity_bg $status_style_active_bg fg)#[bg=default]"
     else
-      tmux set-window-option -g window-status-current-format "$(padding $margin)#[fg=${status_style_bg}]$(get_status_style_fmt $status_style_activity_bg $status_style_active_bg bg)"
+      tmux set-window-option -g window-status-current-format "#[fg=${status_style_bg}]$(get_status_style_fmt $status_style_activity_bg $status_style_active_bg bg)"
     fi
     tmux set-window-option -ga window-status-format "$(get_ple_end right)"
     tmux set-window-option -ga window-status-current-format "$(get_ple_end right)"
@@ -226,7 +229,7 @@ main() {
     tmux set-window-option -ga window-status-format "$(get_ple_end left)"
   fi
 
-  add_margin window-status-current-format
+  # add_margin window-status-current-format
 
   #
   # segments-0-right

@@ -59,8 +59,11 @@ get_icon() {
 	python)
 		echo ""
 		;;
+	docker)
+		echo "󰡨"
+		;;
 	*)
-		echo ""
+		echo "󰊠"
 		;;
 	esac
 }
