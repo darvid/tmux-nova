@@ -7,21 +7,21 @@ segments_dir="$(readlink -f "${current_dir}/../segments")"
 source $current_dir/utils.sh
 
 #
-# dracula color palette
+# catpuccin mocha color palette
 #
-white="#f8f8f2"
-gray="#44475a"
-dark_gray="#282a36"
-light_purple="#bd93f9"
-dark_purple="#6272a4"
-cyan="#8be9fd"
-green="#50fa7b"
-orange="#ffb86c"
-red="#ff5555"
-pink="#ff79c6"
-dark_pink="##803b62"
-yellow="#f1fa8c"
-dark_yellow="##879306"
+white="#cdd6f4"
+gray="#313244"
+dark_gray="#181825"
+light_purple="#cba6f7"
+dark_purple="#b4befe"
+cyan="#94e2d5"
+green="#a6e3a1"
+orange="#fab387"
+red="#f38ba8"
+pink="#f5e0dc"
+dark_pink="##f5c2e7"
+yellow="#f9e2af"
+dark_yellow="#313244"
 
 #
 # global options
@@ -50,15 +50,14 @@ upsert_option "@nova-pane-divider-colors" "fg:${pink}"
 upsert_option "@nova-pane-divider-active-colors" "fg:${pink}"
 
 upsert_option "@nova-segment-mode" "#{?client_prefix,󰐂,󱩜}"
-upsert_option "@nova-segment-mode-colors" "#{?client_prefix,${pink},${dark_pink}} #{?client_prefix,default,default}"
+upsert_option "@nova-segment-mode-colors" "#{?client_prefix,${cyan},${red}} #{?client_prefix,default,default}"
 upsert_option "@nova-segment-whoami" "#(printf ' ')${divider} #[italics]#(whoami)@#h"
-upsert_option "@nova-segment-whoami-colors" "${pink} ${dark_pink}"
-upsert_option "@nova-segment-mode-colors" "${pink} ${dark_gray}"
+set_option "@nova-segment-whoami-colors" "${red} ${dark_gray}"
 
 upsert_option "@nova-segment-spotify" "#(${segments_dir}/spotify.sh)"
 upsert_option "@nova-segment-spotify-roll" true
-upsert_option "@nova-segment-spotify-prefix" " ${divider}"
-upsert_option "@nova-segment-spotify-colors" "${dark_purple} ${light_purple}"
+upsert_option "@nova-segment-spotify-prefix" "󰝚 ${divider}"
+upsert_option "@nova-segment-spotify-colors" "${gray} ${pink}"
 
 upsert_option "@nova-segment-mode-colors" "#{?client_prefix,${green},${dark_gray}} #{?client_prefix,default,default}"
 
