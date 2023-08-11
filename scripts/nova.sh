@@ -51,8 +51,8 @@ upsert_option "@nova-pane-divider-active-colors" "fg:${pink}"
 
 upsert_option "@nova-segment-mode" "#{?client_prefix,󰐂,󱩜}"
 upsert_option "@nova-segment-mode-colors" "#{?client_prefix,${cyan},${red}} #{?client_prefix,default,default}"
-upsert_option "@nova-segment-whoami" "#(printf ' ')${divider} #[italics]#(whoami)@#h"
-set_option "@nova-segment-whoami-colors" "${red} ${dark_gray}"
+upsert_option "@nova-segment-whoami" "󰚌#(printf ' ')${divider} #[italics]#(whoami)@#h"
+upsert_option "@nova-segment-whoami-colors" "${red} ${dark_gray}"
 
 upsert_option "@nova-segment-spotify" "#(${segments_dir}/spotify.sh)"
 upsert_option "@nova-segment-spotify-roll" true
