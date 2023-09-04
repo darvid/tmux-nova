@@ -56,7 +56,7 @@ upsert_option "@nova-segment-whoami-colors" "${red} ${dark_gray}"
 
 upsert_option "@nova-segment-spotify" "#(${segments_dir}/spotify.sh)"
 upsert_option "@nova-segment-spotify-roll" true
-upsert_option "@nova-segment-spotify-prefix" "󰝚 ${divider}"
+upsert_option "@nova-segment-spotify-prefix" " ${divider}"
 upsert_option "@nova-segment-spotify-colors" "${gray} ${pink}"
 
 upsert_option "@nova-segment-mode-colors" "#{?client_prefix,${green},${dark_gray}} #{?client_prefix,default,default}"
