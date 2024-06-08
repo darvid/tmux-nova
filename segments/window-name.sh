@@ -1,19 +1,29 @@
 #!/bin/bash
 # https://github.com/joshmedeski/tmux-nerd-font-window-name
 
+
+tmux_options="$(tmux show -g)"
+
+get_tmux_option() {
+  local option="$1"
+  local default_value="$2"
+  local option_value="$(echo "$tmux_options" | grep "^$option " | cut -d " " -f2-)"
+  [[ "$option_value" == "''" ]] && [[ -z "$default_value" ]] && echo "" || echo "$default_value"
+}
+
 name=$1
 active=${2:false}
-show_name="$(tmux show -gqv '@nova-pane-show-window-name')"
-name_colors="$(tmux show -gqv '@nova-pane-name-colors')"
-icon_colors="$(tmux show -gqv '@nova-pane-icon-colors')"
-show_inactive_divider="$(tmux show -gqv '@nova-pane-show-inactive-divider')"
-divider="$(tmux show -gqv '@nova-pane-divider')"
-divider_colors="$(tmux show -gqv '@nova-pane-divider-colors')"
-divider_colors_active="$(tmux show -gqv '@nova-pane-divider-active-colors')"
+show_name="$(get_tmux_option '@nova-pane-show-window-name')"
+name_colors="$(get_tmux_option '@nova-pane-name-colors')"
+icon_colors="$(get_tmux_option '@nova-pane-icon-colors')"
+show_inactive_divider="$(get_tmux_option '@nova-pane-show-inactive-divider')"
+divider="$(get_tmux_option '@nova-pane-divider' '')"
+divider_colors="$(get_tmux_option '@nova-pane-divider-colors')"
+divider_colors_active="$(get_tmux_option '@nova-pane-divider-active-colors')"
 
 function get_shell_icon() {
 	local default_shell_icon=""
-	local shell_icon="$(tmux show -gqv '@nova-pane-window-name-shell-icon')"
+	local shell_icon="$(tget_tmux_option '@nova-pane-window-name-shell-icon')"
 	if [ -n "$shell_icon" ]; then
 		echo "$shell_icon"
 	else
