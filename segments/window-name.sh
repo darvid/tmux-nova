@@ -4,7 +4,7 @@
 name=$1
 active=${2:false}
 show_name=true
-name_colors="fg:#313244"
+name_colors="fg:white"
 icon_colors="fg:magenta"
 show_inactive_divider="false"
 divider=""
